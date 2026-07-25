@@ -37,7 +37,7 @@ your choice is saved to `config/hypixelpackdisabler.json`.
 
 ## Requirements
 
-- Minecraft 26.2
+- Minecraft 26.2, 26.1.2 & 1.21.11
 - Fabric Loader 0.19.3+
 - Fabric API
 - Fabric Language Kotlin
