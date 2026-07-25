@@ -19,6 +19,8 @@ object HypixelPackDisabler : ClientModInitializer {
 
     override fun onInitializeClient() {
         Http.init()
+        Config.load()
+        Commands.init()
         ServerPackControl.init()
         logger.info("$MOD_NAME ready")
     }

@@ -27,7 +27,7 @@ object ServerPackControl {
         }
     }
 
-    fun isReordering(): Boolean = onHypixel()
+    fun isReordering(): Boolean = Config.enabled && onHypixel()
 
     private fun onHypixel(): Boolean {
         val server = Minecraft.getInstance().currentServer ?: return false

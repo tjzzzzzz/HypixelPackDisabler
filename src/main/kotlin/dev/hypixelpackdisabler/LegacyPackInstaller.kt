@@ -33,7 +33,13 @@ object LegacyPackInstaller {
 
     enum class Status { IDLE, DOWNLOADING, DONE, FAILED }
 
+    fun applyState() {
+        if (Config.enabled) ensureInstalled() else disablePack()
+    }
+
     fun ensureInstalled() {
+        if (!Config.enabled) return
+
         val target = Minecraft.getInstance().resourcePackDirectory.resolve(LOCAL_FILE)
 
         if (target.exists()) {
@@ -113,6 +119,18 @@ object LegacyPackInstaller {
             client.reloadResourcePacks().thenRun {
                 client.execute { selectLegacyPack(client) }
             }
+        }
+    }
+
+    private fun disablePack() {
+        val client = Minecraft.getInstance()
+        client.execute {
+            val id = client.options.resourcePacks.firstOrNull { it.contains(LOCAL_FILE) } ?: return@execute
+            client.options.resourcePacks.remove(id)
+            client.resourcePackRepository.setSelected(client.options.resourcePacks)
+            client.options.save()
+            client.reloadResourcePacks()
+            HypixelPackDisabler.logger.info("disabled legacy pack '{}'", id)
         }
     }
 
