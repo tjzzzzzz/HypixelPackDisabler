@@ -9,6 +9,8 @@ val mavenGroup: String = property("maven_group") as String
 val archivesBaseName: String = property("archives_base_name") as String
 
 val minecraftVersion: String = property("minecraft_version") as String
+val minecraftDependency: String = property("minecraft_dependency") as String
+val javaVersion: Int = (property("java_version") as String).toInt()
 val loaderVersion: String = property("loader_version") as String
 val fabricApiVersion: String = property("fabric_api_version") as String
 val fabricKotlinVersion: String = property("fabric_kotlin_version") as String
@@ -82,6 +84,8 @@ tasks.processResources {
     val props = mapOf(
         "version" to version,
         "minecraft_version" to minecraftVersion,
+        "minecraft_dependency" to minecraftDependency,
+        "java_version" to javaVersion,
         "loader_version" to loaderVersion,
         "fabric_kotlin_version" to fabricKotlinVersion
     )
@@ -90,16 +94,16 @@ tasks.processResources {
 }
 
 kotlin {
-    jvmToolchain(25)
+    jvmToolchain(javaVersion)
 }
 
 java {
     withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
+    sourceCompatibility = JavaVersion.toVersion(javaVersion)
+    targetCompatibility = JavaVersion.toVersion(javaVersion)
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.release.set(25)
+    options.release.set(javaVersion)
 }

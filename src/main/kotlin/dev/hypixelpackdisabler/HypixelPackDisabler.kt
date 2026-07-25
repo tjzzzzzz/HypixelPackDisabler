@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 object HypixelPackDisabler : ClientModInitializer {
 
     const val MOD_ID = "hypixelpackdisabler"
-    const val MOD_NAME = "Hypixel Pack Disabler"
+    const val MOD_NAME = "Hypixel Server Pack Disabler"
 
     val logger: Logger = LoggerFactory.getLogger(MOD_NAME)
 
