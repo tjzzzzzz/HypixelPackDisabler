@@ -155,27 +155,36 @@ object LegacyPackInstaller {
             return
         }
 
-        val alreadyOn = client.options.resourcePacks.contains(id)
-        if (!alreadyOn) client.options.resourcePacks.add(id)
-
-        repo.setSelected(client.options.resourcePacks)
-        client.options.save()
-
-        client.reloadResourcePacks()
-        HypixelPackDisabler.logger.info("enabled legacy pack '{}' (was on: {})", id, alreadyOn)
+        val changed = putLegacyOnTop(client)
+        if (changed) client.reloadResourcePacks()
+        HypixelPackDisabler.logger.info("enabled legacy pack '{}' (reordered: {})", id, changed)
     }
 
-    fun reassertOrdering() {
-        if (!Config.enabled) return
+    fun reassertOrdering(): Boolean {
         val client = Minecraft.getInstance()
-        client.execute {
-            if (!ServerPackControl.isReordering()) return@execute
-            if (!serverPackWinning(client)) return@execute
-            client.resourcePackRepository.setSelected(client.options.resourcePacks)
+        if (!Config.enabled || !ServerPackControl.isReordering()) return false
+        if (!serverPackWinning(client)) return false
+        if (!putLegacyOnTop(client)) return false
+        client.reloadResourcePacks()
+        HypixelPackDisabler.logger.info("server pack was on top, moved legacy back above it")
+        return true
+    }
+
+    private fun putLegacyOnTop(client: Minecraft): Boolean {
+        val repo = client.resourcePackRepository
+        val legacyId = repo.availableIds.firstOrNull { it.contains(LOCAL_FILE) } ?: return false
+
+        if (!client.options.resourcePacks.contains(legacyId)) {
+            client.options.resourcePacks.add(legacyId)
             client.options.save()
-            client.reloadResourcePacks()
-            HypixelPackDisabler.logger.info("server pack had jumped on top, demoted it again")
         }
+
+        val current = repo.selectedPacks.map { it.id }
+        val desired = current.filterNot { it == legacyId } + legacyId
+        if (desired == current) return false
+
+        repo.setSelected(desired)
+        return true
     }
 
     private fun serverPackWinning(client: Minecraft): Boolean {
