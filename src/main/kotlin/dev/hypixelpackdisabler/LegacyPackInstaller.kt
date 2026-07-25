@@ -39,6 +39,7 @@ object LegacyPackInstaller {
 
     fun ensureInstalled() {
         if (!Config.enabled) return
+        Catharsis.warnIfMissing()
 
         val target = Minecraft.getInstance().resourcePackDirectory.resolve(LOCAL_FILE)
 
@@ -69,7 +70,7 @@ object LegacyPackInstaller {
         }
     }
 
-    private fun toast(message: String) {
+    fun toast(message: String) {
         val client = Minecraft.getInstance()
         client.execute {
             val title = Component.literal(HypixelPackDisabler.MOD_NAME)
