@@ -2,7 +2,6 @@ package dev.hypixelpackdisabler
 
 import com.mojang.brigadier.Command
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 
 object Commands {
@@ -13,7 +12,7 @@ object Commands {
     fun init() {
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             dispatcher.register(
-                ClientCommands.literal(HypixelPackDisabler.MOD_ID).executes {
+                Compat.literal(HypixelPackDisabler.MOD_ID).executes {
                     openRequested = true
                     Command.SINGLE_SUCCESS
                 }

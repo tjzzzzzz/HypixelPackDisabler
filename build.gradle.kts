@@ -1,8 +1,24 @@
+import net.fabricmc.loom.api.LoomGradleExtensionAPI
+import net.fabricmc.loom.task.RemapJarTask
+
+buildscript {
+    repositories {
+        maven("https://maven.fabricmc.net/") { name = "Fabric" }
+        mavenCentral()
+    }
+    dependencies {
+        classpath("net.fabricmc:fabric-loom:1.13.6")
+    }
+}
+
 plugins {
-    id("net.fabricmc.fabric-loom") version "1.17.16"
     kotlin("jvm") version "2.4.10"
     kotlin("plugin.serialization") version "2.4.10"
 }
+
+apply(plugin = "fabric-loom")
+
+val loom = the<LoomGradleExtensionAPI>()
 
 val modVersion: String = property("mod_version") as String
 val mavenGroup: String = property("maven_group") as String
@@ -15,23 +31,14 @@ val loaderVersion: String = property("loader_version") as String
 val fabricApiVersion: String = property("fabric_api_version") as String
 val fabricKotlinVersion: String = property("fabric_kotlin_version") as String
 val ktorVersion: String = property("ktor_version") as String
-val devAuthVersion: String = property("devauth_version") as String
 
 version = "$modVersion+$minecraftVersion"
 group = mavenGroup
 base.archivesName.set(archivesBaseName)
 
 repositories {
-    exclusiveContent {
-        forRepository {
-            maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") {
-                name = "DevAuth"
-            }
-        }
-        filter { includeGroup("me.djtheredstoner") }
-    }
-
     mavenCentral()
+    maven("https://maven.fabricmc.net/") { name = "Fabric" }
 }
 
 val bundled: Configuration = configurations.create("bundled") {
@@ -46,37 +53,22 @@ fun ExternalModuleDependency.slim() {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:$minecraftVersion")
-    implementation("net.fabricmc:fabric-loader:$loaderVersion")
+    "minecraft"("com.mojang:minecraft:$minecraftVersion")
+    "mappings"(loom.officialMojangMappings())
+    "modImplementation"("net.fabricmc:fabric-loader:$loaderVersion")
 
-    implementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
-    implementation("net.fabricmc:fabric-language-kotlin:$fabricKotlinVersion")
+    "modImplementation"("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
+    "modImplementation"("net.fabricmc:fabric-language-kotlin:$fabricKotlinVersion")
 
     bundled("io.ktor:ktor-client-core:$ktorVersion") { slim() }
     bundled("io.ktor:ktor-client-cio:$ktorVersion") { slim() }
     bundled("io.ktor:ktor-client-content-negotiation:$ktorVersion") { slim() }
     bundled("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion") { slim() }
-
-    runtimeOnly("me.djtheredstoner:DevAuth-fabric:$devAuthVersion")
 }
 
 afterEvaluate {
     bundled.resolvedConfiguration.resolvedArtifacts.forEach { artifact ->
         dependencies.add("include", artifact.moduleVersion.id.toString())
-    }
-}
-
-loom {
-    runs {
-        named("client") {
-            vmArgs(
-                "-Dmixin.debug.export=true",
-                "-Ddevauth.enabled=true",
-                "-Ddevauth.account=main"
-            )
-        }
-
-        remove(getByName("server"))
     }
 }
 
@@ -106,4 +98,8 @@ java {
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.release.set(javaVersion)
+}
+
+tasks.withType<RemapJarTask>().configureEach {
+    // ensure JIJ nested jars are included
 }
