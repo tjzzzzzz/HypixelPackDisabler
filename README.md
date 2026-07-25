@@ -1,4 +1,4 @@
-# Hypixel Pack Disabler
+# Hypixel Server Pack Disabler
 
 A small client-side Fabric mod that stops Hypixel's server resource pack from
 overriding your textures on SkyBlock.
@@ -46,3 +46,12 @@ your choice is saved to `config/hypixelpackdisabler.json`.
 
 ```bash
 ./gradlew build
+```
+
+The jar ends up in `build/libs/`. Grab the one *without* `-sources` in the name.
+
+## License
+
+All rights reserved. You're free to download and play with it, but not to
+redistribute, modify, or reuse the source. See [LICENSE](LICENSE) for the
+details.
