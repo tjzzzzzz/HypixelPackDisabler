@@ -7,7 +7,7 @@
   "authors": [
     "tj88888"
   ],
-  "license": "MIT",
+  "license": "LicenseRef-All-Rights-Reserved",
   "environment": "client",
   "entrypoints": {
     "client": [
