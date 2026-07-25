@@ -89,11 +89,18 @@ object LegacyPackInstaller {
         val json = client.get(VERSIONS_URL).bodyAsText()
         val versions = Http.json.decodeFromString<List<ModrinthVersion>>(json)
 
+        val running = HypixelPackDisabler.minecraftVersion
         val chosen = versions
             .sortedByDescending { it.datePublished }
             .let { sorted ->
-                sorted.firstOrNull { v -> v.gameVersions.any { it.startsWith("26.") } } ?: sorted.firstOrNull()
+                sorted.firstOrNull { v -> v.gameVersions.contains(running) } ?: sorted.firstOrNull()
             } ?: error("no versions returned by modrinth")
+
+        if (!chosen.gameVersions.contains(running)) {
+            HypixelPackDisabler.logger.warn(
+                "no legacy pack build for {}, falling back to {}", running, chosen.versionNumber
+            )
+        }
 
         val file = chosen.files.firstOrNull { it.primary } ?: chosen.files.firstOrNull()
         ?: error("version ${chosen.versionNumber} has no files")
