@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.toasts.SystemToast
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
+import net.minecraft.server.packs.repository.PackSource
 import java.nio.file.Files
 import java.security.MessageDigest
 import kotlin.io.path.exists
@@ -162,6 +163,27 @@ object LegacyPackInstaller {
 
         client.reloadResourcePacks()
         HypixelPackDisabler.logger.info("enabled legacy pack '{}' (was on: {})", id, alreadyOn)
+    }
+
+    fun reassertOrdering() {
+        if (!Config.enabled) return
+        val client = Minecraft.getInstance()
+        client.execute {
+            if (!ServerPackControl.isReordering()) return@execute
+            if (!serverPackWinning(client)) return@execute
+            client.resourcePackRepository.setSelected(client.options.resourcePacks)
+            client.options.save()
+            client.reloadResourcePacks()
+            HypixelPackDisabler.logger.info("server pack had jumped on top, demoted it again")
+        }
+    }
+
+    private fun serverPackWinning(client: Minecraft): Boolean {
+        val selected = client.resourcePackRepository.selectedPacks.toList()
+        val legacyIndex = selected.indexOfFirst { it.id.contains(LOCAL_FILE) }
+        if (legacyIndex < 0) return false
+        val serverIndex = selected.indexOfLast { it.packSource == PackSource.SERVER }
+        return serverIndex > legacyIndex
     }
 
     private fun sha1Of(path: java.nio.file.Path): String {
