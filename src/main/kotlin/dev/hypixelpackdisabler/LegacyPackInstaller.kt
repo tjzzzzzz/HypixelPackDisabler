@@ -76,7 +76,7 @@ object LegacyPackInstaller {
             val title = Component.literal(HypixelPackDisabler.MOD_NAME)
                 .setStyle(Style.EMPTY.withColor(ACCENT))
             SystemToast.addOrUpdate(
-                client.gui.toastManager(),
+                Compat.toastManager(client),
                 SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
                 title,
                 Component.literal(message)

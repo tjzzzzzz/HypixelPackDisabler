@@ -23,7 +23,7 @@ object Commands {
         ClientTickEvents.END_CLIENT_TICK.register { client ->
             if (!openRequested) return@register
             openRequested = false
-            if (client.gui.screen() == null) client.gui.setScreen(ConfigScreen(null))
+            if (Compat.currentScreen(client) == null) Compat.setScreen(client, ConfigScreen(null))
         }
     }
 }

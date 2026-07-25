@@ -47,7 +47,7 @@ class ConfigScreen(private val parent: Screen?) : Screen(TITLE) {
     }
 
     override fun onClose() {
-        minecraft.gui.setScreen(parent)
+        Compat.setScreen(minecraft, parent)
     }
 
     private fun label(): Component {
