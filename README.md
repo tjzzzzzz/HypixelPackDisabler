@@ -33,6 +33,8 @@ Install this mod and Catharsis, then join Hypixel. That's the whole setup.
 Run `/hypixelpackdisabler` if you want to turn it off. It's on by default, and
 your choice is saved to `config/hypixelpackdisabler.json`.
 
+<img width="843" height="511" alt="image" src="https://github.com/user-attachments/assets/2bbca53e-35c2-43e5-947b-07313b9a7eee" />
+
 ## Requirements
 
 - Minecraft 26.2
